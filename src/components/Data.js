@@ -18,31 +18,36 @@ class Data extends Component {
             this.props.data.forEach(dataset =>
                 ids.push(dataset["id"]))
             let idString = ids.join()
-            fetch(`http://localhost:7082/api/multidata?resource_id=${idString}`, { method: 'get', mode: 'cors' })
+            fetch(`http://localhost:7082/api/multidata?resource_id=${idString}`, { 
+                method: 'post', 
+                mode: 'cors',
+                headers: new Headers({'Content-Type': 'application/json'}),
+                body: JSON.stringify({data: this.props.data})
+            })
             .then(results =>
                 {
                     var data = results.json()
                     console.log(data)
                     return data
-                }
-            ).then(data =>
-                {
-                    var options = {
-                        chart: {
-                            type: "line",
-                        },
-                        xaxis: {
-                            categories: data['xaxis']
-                        }
-                    }
-                    this.setState({options: options})
-                    var seriesData = [
-                        data['series1'],
-                        data['series2']
-                    ]
-                    this.setState({series: seriesData})
-                }
-            )
+                })
+            // ).then(data =>
+            //     {
+            //         var options = {
+            //             chart: {
+            //                 type: "line",
+            //             },
+            //             xaxis: {
+            //                 categories: data['xaxis']
+            //             }
+            //         }
+            //         this.setState({options: options})
+            //         var seriesData = [
+            //             data['series1'],
+            //             data['series2']
+            //         ]
+            //         this.setState({series: seriesData})
+            //     }
+            // )
         } else {
             fetch(`http://localhost:7082/api/data?resource_id=${this.props.resource}`, { method: 'get', mode: 'cors' })
             .then(results =>

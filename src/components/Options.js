@@ -11,7 +11,6 @@ import { withRouter } from 'react-router-dom';
 class Options extends Component {
     constructor() {
         super();
-        this.handleSubmit = this.handleSubmit.bind(this);
         this.metadata = [
             {
                 "name": "RP Total Enrolment 2019",
@@ -80,12 +79,6 @@ class Options extends Component {
         };
     };
 
-    handleSubmit(e) {
-        this.props.navigation.navigate('SecondPage', {
-            JSON_ListView_Clicked_Item: this.state.username,
-          })
-    }
-
     nextPath(path) {
         this.props.history.push({
             pathname: path,
@@ -125,7 +118,10 @@ class Options extends Component {
                 this.options.push({})
                 let index = this.options.length-1;
                 trace = this.options[index]
+                trace['dataset_name'] = dataset.name
                 trace['id'] = dataset.resource_id
+                trace['total_rows'] = dataset.total_rows
+                trace['values'] = dataset.values[0].name
                 let measures = []
                 measures.push(<Form.Label><h3>{dataset.name}</h3></Form.Label>)
                 
@@ -137,6 +133,9 @@ class Options extends Component {
 
                         if("options" in measure){
                             trace[measure.name] = measure.options
+                            if(measure.type == "datetime"){
+                                trace['datetime'] = measure.name
+                            }
                             measure.options.forEach(option =>
                                 {
                                     var value = index + "||" + measure.name + "||" + option;

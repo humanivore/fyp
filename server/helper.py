@@ -1,3 +1,4 @@
+from flask import make_response
 import pandas as pd
 import requests
 import json
@@ -154,3 +155,56 @@ def check_time_interval(fields):
 			field_id = None
 			field_interval = None 
 	return field_id, field_interval
+
+
+def new_process_data(options):
+	options = options['data']
+	all_data = {}
+
+	# filter to only retain data in the range selected by user
+	for dataset in options:
+		id = dataset['id']
+		limit = dataset['total_rows']
+		response = get_data_by_id(id, limit=limit)
+
+		if response.status_code == 404:
+			resp = make_response(f"Requested resource (ID: {resource}) does not exist", 404)
+			return resp
+
+		records = response.json()['result']['records']
+		data_required = []
+		for record in records:
+			include = True
+			for key, value in record.items():
+				if key == "_id":
+					continue
+				if key != dataset['values']: # check measures only
+					if value not in dataset[key]:
+						include = False
+						break
+			if include:
+				data_required.append(record)
+
+		# split by measures (non-datetime)
+		sorted_data = {}
+		non_datetime_measures = []
+		skip = ['dataset_name', 'id', 'total_rows', 'datetime', 'values']
+		if 'datetime' in dataset:
+			skip.append(dataset['datetime'])
+		for key, value in dataset.items():
+			if key not in skip:
+				non_datetime_measures.append(key)
+		if len(non_datetime_measures) is 0:
+			sorted_data = data_required
+		else:
+			for measure in non_datetime_measures:
+				for option in dataset[measure]:
+					new_list = list(filter(lambda x: x[measure] == option, data_required))
+					sorted_data[option] = new_list
+		
+		
+		all_data[id] = sorted_data
+	
+
+	resp = make_response(all_data, 200)
+	return resp

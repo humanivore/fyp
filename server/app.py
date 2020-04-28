@@ -90,7 +90,7 @@ def data():
 	return resp
 
 
-@app.route('/api/multidata', methods=['GET'])
+@app.route('/api/multidata', methods=['GET', 'POST'])
 def multidata():
 	# should return x-axis (list) and series (dict of lists)
 	resource_id = request.args.get('resource_id')
@@ -101,6 +101,11 @@ def multidata():
 	
 	id_query = request.args.get('resource_id')
 	id_list = id_query.split(',')
+
+	if request.method == 'POST':
+		body = request.json
+		resp = helper.new_process_data(body)
+		return resp
 	
 	data = []
 
@@ -111,7 +116,7 @@ def multidata():
 			resp = make_response(f"Requested resource (ID: {resource}) does not exist", 404)
 			return resp
 
-		data.append(response.json())
+		data.append(response.json()['result']['records'])
 
 	year, series1, series2 = helper.process_data(data[0], data[1])
 	processed_data = {

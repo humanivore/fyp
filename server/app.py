@@ -14,7 +14,7 @@ CORS(app)
 # API routes
 ##
 
-app.config['JSON_SORT_KEYS'] = False
+app.config['JSON_SORT_KEYS'] = False  # prevent alphabetical sort
 
 @app.route('/api/items')
 def items():
@@ -27,6 +27,7 @@ def resource():
 	"""
 	API route for retrieving dataset metadata via data.gov.sg API
 	Required parameter: resource_id
+	Returns resource name, id, total rows, measures and values
 	"""
 
 	resource_id = request.args.get('resource_id')

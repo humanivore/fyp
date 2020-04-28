@@ -2,8 +2,12 @@ import pandas as pd
 import requests
 import json
 
-def get_data_by_id(resource_id):
+def get_data_by_id(resource_id, limit=None, offset=None):
 	url = f"https://data.gov.sg/api/action/datastore_search?resource_id={resource_id}"
+	if limit:
+		url += f"&limit={limit}"
+	if offset:
+		url += f"&offset={offset}"
 	response = requests.get(url)
 	return response
 
@@ -44,6 +48,8 @@ def process_info(info):
 			}
 			if 'coverage' in json.loads(field['detected_types'])[0]['metadata']:
 				measure['coverage'] = json.loads(field['detected_types'])[0]['metadata']['coverage']
+			else:
+				measure['options'] = get_measure_options(resource_id, total_rows, name)
 			measures.append(measure)
 	info = {
 		"name": resource_name,
@@ -54,6 +60,20 @@ def process_info(info):
 	}
 
 	return info	
+
+
+def get_measure_options(resource_id, total_rows, measure_name):
+	resp = get_data_by_id(resource_id, limit=total_rows)
+	# required to go through entire dataset because of how some datasets are ordered
+	data = resp.json()['result']['records']
+	options = []
+	for record in data:
+		option = record[measure_name]
+		if option in options:
+			continue
+		else:
+			options.append(option)
+	return options
 
 
 def process_fields(fields1, fields2):

@@ -7,16 +7,7 @@ class Data extends Component {
         super();
         this.state = {
             data: [],
-            apex: {
-                options: {
-                    chart: {
-                      id: "basic-bar"
-                    },
-                    xaxis: {
-                        type: 'numeric'
-                    }
-                },
-            },
+            options: {},
             series: [],
         };
     };
@@ -24,6 +15,31 @@ class Data extends Component {
     fetchAndDisplay() {
         if (this.props.resource.length > 1) {
             // CODE
+            fetch(`http://localhost:7082/api/multidata?resource_id=${this.props.resource}`, { method: 'get', mode: 'cors' })
+            .then(results =>
+                {
+                    var data = results.json()
+                    console.log(data)
+                    return data
+                }
+            ).then(data =>
+                {
+                    var options = {
+                        chart: {
+                            type: "line",
+                        },
+                        xaxis: {
+                            categories: data['xaxis']
+                        }
+                    }
+                    this.setState({options: options})
+                    var seriesData = [
+                        data['series1'],
+                        data['series2']
+                    ]
+                    this.setState({series: seriesData})
+                }
+            )
         } else {
             fetch(`http://localhost:7082/api/data?resource_id=${this.props.resource}`, { method: 'get', mode: 'cors' })
             .then(results =>
@@ -46,10 +62,19 @@ class Data extends Component {
                 })
                 var series = [{
                     name: "Enrolment - MOE Kindergartens",
-                    data: seriesData,
+                    data: data1,
                 }]
                 this.setState({series: series})
                 console.log("series", this.state.series.data);
+                var options = {                
+                    chart: {
+                        id: "basic-bar"
+                    },
+                    xaxis: {
+                        type: 'numeric'
+                    }
+                }
+                this.setState({options: options})
             });
         }
     }
@@ -74,9 +99,8 @@ class Data extends Component {
             <div className="chart">
                 {/* {this.state.data} */}
                 <Chart
-              options={this.state.apex.options}
+              options={this.state.options}
               series={this.state.series}
-              type="bar"
               width="500"
             />
             </div>

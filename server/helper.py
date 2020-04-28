@@ -1,10 +1,59 @@
 import pandas as pd
 import requests
+import json
 
 def get_data_by_id(resource_id):
 	url = f"https://data.gov.sg/api/action/datastore_search?resource_id={resource_id}"
 	response = requests.get(url)
 	return response
+
+
+def get_info_by_resource_id(resource_id):
+	url = f"https://data.gov.sg/api/action/resource_show?id={resource_id}"
+	response = requests.get(url)
+	return response
+
+
+def process_info(info):
+	# return NAME, RESOURCE_ID, TOTAL_ROWS, MEASURES, VALUES in a JSON object format
+
+	resource_name = info['name']
+	resource_id = info['id']
+	total_rows = info['fields'][0]['total']
+	measures = []
+	values = []
+	for field in info['fields']:
+		if 'unit_of_measure' in field:
+			title = field['title'] # to label dataset
+			unit = field['unit_of_measure'] # to label axis
+			name = field['name'] # to find within dataset
+			value = {
+				"title": title,
+				"unit": unit,
+				"name": name
+			}
+			values.append(value)
+		else:
+			title = field["title"]
+			name = field["name"]
+			datatype = field["type"]
+			measure = {
+				"title": title,
+				"name": name,
+				"type": datatype
+			}
+			if 'coverage' in json.loads(field['detected_types'])[0]['metadata']:
+				measure['coverage'] = json.loads(field['detected_types'])[0]['metadata']['coverage']
+			measures.append(measure)
+	info = {
+		"name": resource_name,
+		"resource_id": resource_id,
+		"total_rows": total_rows,
+		"measures": measures,
+		"values": values
+	}
+
+	return info	
 
 
 def process_fields(fields1, fields2):
@@ -27,11 +76,11 @@ def process_fields(fields1, fields2):
 def process_data(data1, data2):
 	# try to merge with common column
 	# e.g. df1.merge(df2, how='left', left_on='year', right_on='academic_year')
-	fields1 = list(map(lambda x: x['result']['fields'], data1))
-	fields2 = list(map(lambda x: x['result']['fields'], data2))
+	fields1 = data1['result']['fields']
+	fields2 = data2['result']['fields']
 
-	records1 = list(map(lambda x: x['result']['records'], data1))
-	records2 = list(map(lambda x: x['result']['records'], data2))
+	records1 = data1['result']['records']
+	records2 = data2['result']['records']
 
 	processed_fields = process_fields(fields1, fields2)
 
@@ -42,11 +91,21 @@ def process_data(data1, data2):
 		df2 = pd.DataFrame(records2)
 
 		if processed_fields[0] is True:
-			### HERE
-			df1.merge(df2, how='outer', left_on=processed_fields[1], right_on=processed_fields[2])
-
-	
-
+			### HERE. assume for now that left join, left range > right 
+			df3 = df1.merge(df2, how='left', left_on=processed_fields[1], right_on=processed_fields[2])
+			df3 = df3.sort_values(by=processed_fields[1],ascending=True)
+			df3 = df3.where(pd.notnull(df3), None)
+			year = df3[processed_fields[1]].tolist()
+			series1 = {
+				"name": 'Enrolment - MOE Kindergartens', 
+				"data": df3['enrolment'].tolist()
+			}
+			series2 = {
+				"name": "Republic Polytechnic Total Enrolment 2019",
+				"data": df3['total_enrolment'].tolist()
+			}
+			
+			return year, series1, series2
 
 
 def check_time_interval(fields):

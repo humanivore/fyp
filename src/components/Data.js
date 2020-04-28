@@ -97,7 +97,6 @@ class Data extends Component {
     render() {
         return (
             <div className="chart">
-                {/* {this.state.data} */}
                 <Chart
               options={this.state.options}
               series={this.state.series}

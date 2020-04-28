@@ -48,6 +48,7 @@ def process_info(info):
 			}
 			if 'coverage' in json.loads(field['detected_types'])[0]['metadata']:
 				measure['coverage'] = json.loads(field['detected_types'])[0]['metadata']['coverage']
+				measure['options'] = get_measure_options(resource_id, total_rows, name)
 			else:
 				measure['options'] = get_measure_options(resource_id, total_rows, name)
 			measures.append(measure)
@@ -113,8 +114,8 @@ def process_data(data1, data2):
 		if processed_fields[0] is True:
 			### HERE. assume for now that left join, left range > right 
 			df3 = df1.merge(df2, how='left', left_on=processed_fields[1], right_on=processed_fields[2])
-			df3 = df3.sort_values(by=processed_fields[1],ascending=True)
-			df3 = df3.where(pd.notnull(df3), None)
+			df3 = df3.sort_values(by=processed_fields[1],ascending=True) # sort bc some datasets are reversed
+			df3 = df3.where(pd.notnull(df3), None) # replace NaN with None so null in JSON
 			year = df3[processed_fields[1]].tolist()
 			series1 = {
 				"name": 'Enrolment - MOE Kindergartens', 

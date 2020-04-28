@@ -1,0 +1,13 @@
+.form-group {
+    padding: 10px 0;
+}
+
+.form-label {
+    display: block;
+    padding: 10px 0;
+}
+
+.container {
+    margin: auto;
+    width: 500px;
+}

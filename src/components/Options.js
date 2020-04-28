@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import Data from './Data';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import './Styles/options.css';
+import { withRouter } from 'react-router-dom';
+
 
 class Options extends Component {
     constructor() {
@@ -13,111 +14,30 @@ class Options extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.metadata = [
             {
-                "name": "Singapore Residents by Ethnic Group and Sex, End June, Annual",
-                "resource_id": "f9dbfc75-a2dc-42af-9f50-425e4107ae84",
-                "total_rows": 930,
+                "name": "RP Total Enrolment 2019",
+                "resource_id": "1525c43e-b3b4-4071-a3c2-fb3a298b399b",
+                "total_rows": 3,
                 "measures": [
                     {
-                        "title": "Year",
-                        "name": "year",
+                        "title": "Academic year",
+                        "name": "academic_year",
                         "type": "datetime",
                         "coverage": {
-                            "max": "2018",
-                            "min": "1957"
+                            "max": "2019",
+                            "min": "2017"
                         },
                         "options": [
-                            "1957",
-                            "1958",
-                            "1959",
-                            "1960",
-                            "1961",
-                            "1962",
-                            "1963",
-                            "1964",
-                            "1965",
-                            "1966",
-                            "1967",
-                            "1968",
-                            "1969",
-                            "1970",
-                            "1971",
-                            "1972",
-                            "1973",
-                            "1974",
-                            "1975",
-                            "1976",
-                            "1977",
-                            "1978",
-                            "1979",
-                            "1980",
-                            "1981",
-                            "1982",
-                            "1983",
-                            "1984",
-                            "1985",
-                            "1986",
-                            "1987",
-                            "1988",
-                            "1989",
-                            "1990",
-                            "1991",
-                            "1992",
-                            "1993",
-                            "1994",
-                            "1995",
-                            "1996",
-                            "1997",
-                            "1998",
-                            "1999",
-                            "2000",
-                            "2001",
-                            "2002",
-                            "2006",
-                            "2003",
-                            "2004",
-                            "2005",
-                            "2007",
-                            "2008",
-                            "2009",
-                            "2010",
-                            "2011",
-                            "2012",
-                            "2013",
-                            "2014",
-                            "2015",
-                            "2016",
-                            "2017",
-                            "2018"
-                        ]
-                    },
-                    {
-                        "title": "Ethnic Group/Gender",
-                        "name": "level_1",
-                        "type": "text",
-                        "options": [
-                            "Total Residents",
-                            "Total Male Residents",
-                            "Total Female Residents",
-                            "Total Malays",
-                            "Total Male Malays",
-                            "Total Female Malays",
-                            "Total Chinese",
-                            "Total Male Chinese",
-                            "Total Female Chinese",
-                            "Total Indians",
-                            "Total Male Indians",
-                            "Total Female Indians",
-                            "Other Ethnic Groups (Total)",
-                            "Other Ethnic Groups (Males)",
-                            "Other Ethnic Groups (Females)"
+                            "2019",
+                            "2018",
+                            "2017"
                         ]
                     }
                 ],
                 "values": [
                     {
-                        "title": "Value",
-                        "unit": "Number",
-                        "name": "value"
+                        "title": "Total enrolment",
+                        "unit": "EA",
+                        "name": "total_enrolment"
                     }
                 ]
             },
@@ -161,11 +81,16 @@ class Options extends Component {
     };
 
     handleSubmit(e) {
-        this.setState({options: this.options});
-        console.log('resource', this.resource);
-        console.log('resourceId', this.state.resourceId);
+        this.props.navigation.navigate('SecondPage', {
+            JSON_ListView_Clicked_Item: this.state.username,
+          })
+    }
 
-        e.preventDefault();
+    nextPath(path) {
+        this.props.history.push({
+            pathname: path,
+            data: this.options // your data array of objects
+        })
     }
 
     handleCheck(e) {
@@ -194,7 +119,7 @@ class Options extends Component {
         var trace = this.options;
 
         let main = []
-        main.push(<Form.Label><h1>Select data range options</h1></Form.Label>)
+        main.push(<Form.Label><h2>Select data range options</h2></Form.Label>)
         this.metadata.forEach(dataset =>
             {
                 this.options.push({})
@@ -202,13 +127,13 @@ class Options extends Component {
                 trace = this.options[index]
                 trace['id'] = dataset.resource_id
                 let measures = []
-                measures.push(<Form.Label><h2>{dataset.name}</h2></Form.Label>)
+                measures.push(<Form.Label><h3>{dataset.name}</h3></Form.Label>)
                 
                 dataset.measures.forEach(measure =>
                     {
                         console.log("trace", trace);
                         let options = []
-                        options.push(<Form.Label><h3>{measure.title}</h3></Form.Label>)
+                        options.push(<Form.Label><h4>{measure.title}</h4></Form.Label>)
 
                         if("options" in measure){
                             trace[measure.name] = measure.options
@@ -237,7 +162,7 @@ class Options extends Component {
                 main.push(<Form.Group controlId={dataset.name}>{measures}</Form.Group>)
             }
         )
-        main.push()
+        main.push(<Button variant="outline-secondary" onClick={() => this.nextPath('/about') }>Submit</Button>)
         form.push(<Form>{main}</Form>)
         return form
     }
@@ -245,9 +170,7 @@ class Options extends Component {
 
     render(){
         return (
-            
             <Container>
-            <Data resource={this.state.resourceId}/>
             <div>
                 { this.reactForm() }
             </div>
@@ -256,4 +179,4 @@ class Options extends Component {
     }
 }
 
-export default Options;
+export default withRouter(Options);

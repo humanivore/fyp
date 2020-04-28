@@ -13,9 +13,12 @@ class Data extends Component {
     };
 
     fetchAndDisplay() {
-        if (this.props.resource.length > 1) {
-            // CODE
-            fetch(`http://localhost:7082/api/multidata?resource_id=${this.props.resource}`, { method: 'get', mode: 'cors' })
+        if (this.props.data.length > 1) {
+            let ids = []
+            this.props.data.forEach(dataset =>
+                ids.push(dataset["id"]))
+            let idString = ids.join()
+            fetch(`http://localhost:7082/api/multidata?resource_id=${idString}`, { method: 'get', mode: 'cors' })
             .then(results =>
                 {
                     var data = results.json()
@@ -93,8 +96,13 @@ class Data extends Component {
             this.fetchAndDisplay();
         }
     }
+
+    componentDidMount() {
+        this.fetchAndDisplay();
+    }
     
     render() {
+        console.log(this.props.data);
         return (
             <div className="chart">
                 <Chart

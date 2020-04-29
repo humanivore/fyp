@@ -211,7 +211,7 @@ def new_process_data(options):
 								label = standardised_time_label(item)
 								dataset['interval'] = label
 							else:
-								label = item['title']
+								label = dataset['dataset_name'] + " - " + item['title']
 							labelled_sorted_data[label] = v
 		else:
 			for measure in non_datetime_measures:
@@ -232,7 +232,7 @@ def new_process_data(options):
 											label = standardised_time_label(item)
 											dataset['interval'] = label
 										else:
-											label = item['title']
+											label = dataset['dataset_name'] + " - " + item['title']
 										labelled_sorted_data[label] = v
 		
 		all_data[dataset['dataset_name']] = labelled_sorted_data

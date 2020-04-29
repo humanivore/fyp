@@ -1,15 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Nav, Navbar } from 'react-bootstrap';
+
 
 export default class AppWrapper extends React.Component {
   render() {
     return (
       <div className='app-container'>
-        <Link to={'/'}>Home</Link>
-        <Link to={'/about'}>About</Link>
-        <Link to={'/about/subroute'}>Subcomponent</Link>
-        <Link to={'/index1'}>Hi</Link>
-        <Link to={'/hello'}>Hello</Link>
+        <Navbar bg="light" expand="lg">
+        <Navbar.Brand href="/">SGData</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="mr-auto">
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link href="#link">Link</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+        </Navbar>
         {this.props.children}
       </div>
     )

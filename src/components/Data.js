@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import Chart from "react-apexcharts";
+import Alert from 'react-bootstrap/Alert';
+import Container from 'react-bootstrap/Container';
+import './Styles/options.css';
 
 
 class Data extends Component {
@@ -110,28 +113,39 @@ class Data extends Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
-        console.log('props.resource', this.props.resource);
-        if (this.props.resource !== prevProps.resource) {
-            this.fetchAndDisplay();
-        }
-    }
+    // componentDidUpdate(prevProps) {
+    //     console.log('props.resource', this.props.resource);
+    //     if (this.props.resource !== prevProps.resource) {
+    //         this.fetchAndDisplay();
+    //     }
+    // }
 
     componentDidMount() {
-        this.fetchAndDisplay();
+        try {
+            this.fetchAndDisplay();
+        } catch(err) {
+
+        }
     }
     
     render() {
-        console.log(this.props.data);
-        return (
-            <div className="chart">
-                <Chart
-              options={this.state.options}
-              series={this.state.series}
-              width="500"
-            />
-            </div>
-        )
+        try {
+            return (
+                <div className="chart">
+                    <Container>
+                    <Chart
+                  options={this.state.options}
+                  series={this.state.series}
+                  width="500"
+                />
+                    </Container>
+                </div>
+            )
+        } catch(err) {
+            <Alert variant='primary'>
+                Please click on the submit button again!
+            </Alert>
+        } 
     }
 }
 

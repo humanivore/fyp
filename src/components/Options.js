@@ -114,7 +114,7 @@ class Options extends Component {
         var trace = this.options;
 
         let main = []
-        main.push(<Form.Label><h2>Select data range options</h2></Form.Label>)
+        main.push(<Form.Label><h3>Select data range options</h3></Form.Label>)
         this.metadata.forEach(dataset =>
             {
                 this.options.push({})
@@ -125,13 +125,13 @@ class Options extends Component {
                 trace['total_rows'] = dataset.total_rows
                 trace['values'] = dataset.values[0].name
                 let measures = []
-                measures.push(<Form.Label><h3>{dataset.name}</h3></Form.Label>)
+                measures.push(<Form.Label><h4>{dataset.name}</h4></Form.Label>)
                 
                 dataset.measures.forEach(measure =>
                     {
                         console.log("trace", trace);
                         let options = []
-                        options.push(<Form.Label><h4>{measure.title}</h4></Form.Label>)
+                        options.push(<Form.Label><h5>{measure.title}</h5></Form.Label>)
 
                         if("options" in measure){
                             trace[measure.name] = measure.options
@@ -164,7 +164,7 @@ class Options extends Component {
                 main.push(<Form.Group controlId={dataset.name}>{measures}</Form.Group>)
             }
         )
-        main.push(<Button variant="outline-secondary" onClick={() => this.nextPath('/about') }>Submit</Button>)
+        main.push(<Button variant="outline-secondary" onClick={() => this.nextPath('/chart') }>Submit</Button>)
         form.push(<Form>{main}</Form>)
         return form
     }

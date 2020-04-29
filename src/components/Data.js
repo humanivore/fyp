@@ -29,25 +29,40 @@ class Data extends Component {
                     var data = results.json()
                     console.log(data)
                     return data
-                })
-            // ).then(data =>
-            //     {
-            //         var options = {
-            //             chart: {
-            //                 type: "line",
-            //             },
-            //             xaxis: {
-            //                 categories: data['xaxis']
-            //             }
-            //         }
-            //         this.setState({options: options})
-            //         var seriesData = [
-            //             data['series1'],
-            //             data['series2']
-            //         ]
-            //         this.setState({series: seriesData})
-            //     }
-            // )
+                }
+            ).then(result =>
+                {
+                    let chartData = result.data
+                    if('datetime' in chartData){
+                        let x = []
+                        let seriesData = []
+                        for(const [k, v] of Object.entries(chartData)){
+                            if (k == 'datetime'){
+                                continue
+                            } else if (k == chartData.datetime){
+                                x = v
+                            } else {
+                                seriesData.push({
+                                    name: k,
+                                    data: v
+                                })
+                            }
+                        }
+                        let options = {
+                            chart: {
+                                type: "line"
+                            },
+                            xaxis: {
+                                categories: x
+                            }
+                        }
+                        console.log("options", options);
+                        console.log("series", seriesData);
+                        this.setState({options: options})
+                        this.setState({series: seriesData})
+                    }
+                }
+            )
         } else {
             fetch(`http://localhost:7082/api/data?resource_id=${this.props.resource}`, { method: 'get', mode: 'cors' })
             .then(results =>

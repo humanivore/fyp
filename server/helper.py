@@ -48,6 +48,7 @@ def process_info(info):
 				"type": datatype
 			}
 			if 'coverage' in json.loads(field['detected_types'])[0]['metadata']:
+				measure['interval'] = field["sub_type"]
 				measure['coverage'] = json.loads(field['detected_types'])[0]['metadata']['coverage']
 				measure['options'] = get_measure_options(resource_id, total_rows, name)
 			else:
@@ -165,6 +166,7 @@ def new_process_data(options):
 	for dataset in options:
 		id = dataset['id']
 		limit = dataset['total_rows']
+		
 		response = get_data_by_id(id, limit=limit)
 
 		if response.status_code == 404:
@@ -185,26 +187,122 @@ def new_process_data(options):
 			if include:
 				data_required.append(record)
 
-		# split by measures (non-datetime)
+		# split by measures (non-datetime), then separate arrays for x and y
 		sorted_data = {}
 		non_datetime_measures = []
-		skip = ['dataset_name', 'id', 'total_rows', 'datetime', 'values']
+		skip = ['dataset_name', 'id', 'total_rows', 'datetime', 'interval', 'values']
 		if 'datetime' in dataset:
 			skip.append(dataset['datetime'])
 		for key, value in dataset.items():
 			if key not in skip:
 				non_datetime_measures.append(key)
 		if len(non_datetime_measures) is 0:
-			sorted_data = data_required
+			if 'datetime' in dataset:
+				datetime = dataset['datetime']
+				value = dataset['values']
+				sorted_data[datetime] = list(map(lambda x: x[datetime], data_required))
+				sorted_data[value] = list(map(lambda x: x[value], data_required))
+				meta = get_info_by_resource_id(id).json()['result']['fields']
+				labelled_sorted_data = {}
+				for k,v in sorted_data.items(): # replace labels with proper names
+					for item in meta:
+						if item['name'] == k:
+							if item['type'] == 'datetime':
+								label = standardised_time_label(item)
+								dataset['interval'] = label
+							else:
+								label = item['title']
+							labelled_sorted_data[label] = v
 		else:
 			for measure in non_datetime_measures:
 				for option in dataset[measure]:
 					new_list = list(filter(lambda x: x[measure] == option, data_required))
-					sorted_data[option] = new_list
+					if 'datetime' in dataset:
+						datetime = dataset['datetime']
+						value = dataset['values']
+						sorted_data[option][datetime] = list(map(lambda x: x[datetime], new_list))
+						sorted_data[option][value] = list(map(lambda x: x[value], new_list))
+						meta = get_info_by_resource_id(id).json()['result']['fields']
+						labelled_sorted_data = {}
+						for sorted_list in sorted_data:
+							for k,v in sorted_list.items():
+								for item in meta:
+									if item['name'] == k:
+										if item['type'] == 'datetime':
+											label = standardised_time_label(item)
+											dataset['interval'] = label
+										else:
+											label = item['title']
+										labelled_sorted_data[label] = v
 		
-		
-		all_data[id] = sorted_data
+		all_data[dataset['dataset_name']] = labelled_sorted_data
 	
+	# now to combine the data
+	is_datetime = True
+	is_same_interval = True
+	interval = ''
+	for dataset in options:
+		if 'datetime' not in dataset:
+			is_datetime = False
+			continue 
+		else:
+			if interval == '':
+				interval = dataset['interval']
+			else:
+				if dataset['interval'] != interval:
+					is_same_interval = False
 
-	resp = make_response(all_data, 200)
+	if is_same_interval:
+		chart_data = same_time_interval(all_data, interval)
+
+	resp = make_response({"data": chart_data}, 200)
 	return resp
+
+
+def same_time_interval(data, interval):
+	dfs = []
+	multi = False
+	for dataset in data.values():
+		for items in dataset.values():
+			if isinstance(items, dict):
+				# code for multilayer
+				pass
+			else:
+				break
+		dfs.append(pd.DataFrame.from_dict(dataset))
+	time = []
+	if not multi:
+		for dataset in data.values():
+			time.append(dataset[interval])
+		time_set = []
+		for item in time:
+			time_set = time_set + item
+		time_set = {interval: list(sorted(set(time_set)))}
+		control_df = pd.DataFrame.from_dict(time_set)
+		
+		merged_df = control_df
+		for df in dfs:
+			merged_df = merged_df.merge(df, how='left', left_on=interval, right_on=interval)
+		merged_df = merged_df.where(pd.notnull(merged_df), None) # replace NaN with None so null in JSON
+
+		chart_data = {
+			"datetime": interval,
+			interval: merged_df[interval].tolist()
+		}
+		for column in merged_df:
+			chart_data[column] = merged_df[column].tolist()
+			
+		return chart_data
+
+
+def standardised_time_label(field):
+	if field['sub_type'] == "year":
+		return "Year"
+	elif field['sub_type'] == "quarter":
+		return "Quarter"
+	elif field['sub_type'] == "half_year":
+		return "Half Year"
+	elif field['sub_type'] == "month":
+		return "Month"
+	else:
+		raise ValueError("Not datetime")

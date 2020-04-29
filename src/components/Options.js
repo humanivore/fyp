@@ -21,6 +21,7 @@ class Options extends Component {
                         "title": "Academic year",
                         "name": "academic_year",
                         "type": "datetime",
+                        "interval": "year",
                         "coverage": {
                             "max": "2019",
                             "min": "2017"
@@ -49,6 +50,7 @@ class Options extends Component {
                         "title": "Year",
                         "name": "year",
                         "type": "datetime",
+                        "interval": "year",
                         "coverage": {
                             "max": "2020",
                             "min": "2014"
@@ -135,6 +137,7 @@ class Options extends Component {
                             trace[measure.name] = measure.options
                             if(measure.type == "datetime"){
                                 trace['datetime'] = measure.name
+                                trace['interval'] = measure.interval
                             }
                             measure.options.forEach(option =>
                                 {

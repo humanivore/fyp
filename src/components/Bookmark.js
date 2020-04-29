@@ -11,17 +11,27 @@ class Bookmark extends Component {
         }
     };
 
-    componentDidUpdate(prevProps) {
-        if (this.props.resourceId !== prevProps.resourceId) {
-            // code
-        }
+    display() {
+        let results = []
+        this.props.resourceId.forEach(e => {
+            let item = []
+            item.push(<div key={e.id}>{e.name}</div>)
+            item.push(<Button 
+                variant="outline-secondary" 
+                key={e.id+ "-remove"}
+                value={e.name}
+                id={e.id}
+                onClick={this.props.handler}>Remove</Button>)
+            results.push(<Container key={e.id + "-box"}>{item}</Container>)
+        });
+        return results
     }
 
     render(){
         return (
             <div>
                 <Container>
-                    {this.state.resourceId}
+                    {this.display()}
                 </Container>
             </div>
         );

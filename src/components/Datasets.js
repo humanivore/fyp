@@ -7,8 +7,10 @@ import Container from "react-bootstrap/Container";
 class Datasets extends Component {
     constructor(props) {
         super(props)
+        this.changeState = this.changeState.bind(this);
+        this.handler = this.handler.bind(this)
         this.state = {
-        filter: ""
+            resourceId: []
         }
     }
 
@@ -18,10 +20,47 @@ class Datasets extends Component {
             let item = []
             item.push(<h4 key={e.id + "-name"}>{e.name}</h4>)
             item.push(<div key={e.id + "-desc"}>{e.description}</div>)
-            item.push(<Button variant="outline-secondary" key={e.id}>Add</Button>)
+            item.push(<Button 
+                variant="outline-secondary" 
+                key={e.id}
+                value={e.name}
+                id={e.id}
+                onClick={this.changeState}>Add</Button>)
             results.push(<Container key={e.id + "-box"}>{item}</Container>)
         });
         return results
+    }
+
+    changeState(e) {
+        let item = {
+            name: e.target.value,
+            id: e.target.id
+        }
+        console.log(item)
+        let newArray = []
+        console.log(this.state.resourceId);
+        if(this.state.resourceId.indexOf(item) > -1){
+            newArray = this.state.resourceId.filter(e => e !== item)
+        } else {
+            newArray = [...this.state.resourceId, item];
+        }
+        this.setState({resourceId: newArray})
+        console.log(this.state.resourceId);
+    }
+
+    handler(e) {
+        let id = e.target.id
+        let newArray = []
+        this.state.resourceId.forEach(item => {
+            for (let [key, value] of Object.entries(item)) {
+                if(key == "id"){
+                    if(value == id){
+                        newArray = this.state.resourceId.filter(e => e !== item)
+                        this.setState({resourceId: newArray})
+                    }
+                }
+            }
+        })
     }
     
     
@@ -32,7 +71,7 @@ class Datasets extends Component {
                 <FilterForm onChange={this.props.onChange}/>
                 {this.display()}
             </Container>
-            <Bookmark resourceId={this.state.resourceId} />
+            <Bookmark resourceId={this.state.resourceId} handler={this.handler} />
         </div>
         )
     }

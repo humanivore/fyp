@@ -39,7 +39,7 @@ class Browser extends Component {
     render(){
         return (
             <div>
-                <Datasets data={this.state.filtered}  match={this.props.match} onChange={this.filterData} />
+                <Datasets data={this.state.filtered} match={this.props.match} onChange={this.filterData} />
             </div>
         );
     }

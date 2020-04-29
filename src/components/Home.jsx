@@ -1,10 +1,9 @@
 import React from 'react';
-import Options from './Options';
+import Browser from './Browser';
 
 const Home = (props) => (
   <div className='home'>
-    Home
-    <Options />
+    <Browser />
   </div>
 )
 

@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
-import Data from './Data';
 import Button from 'react-bootstrap/Button';
 import { Container } from '@material-ui/core';
+import { withRouter } from 'react-router-dom';
 
 class Bookmark extends Component {
     constructor() {
         super();
-        this.state = {
-            resourceId: []
-        }
     };
 
     display() {
         let results = []
+        results.push(<h4 id="title-bookmark">Bookmarked</h4>)
         this.props.resourceId.forEach(e => {
             let item = []
             item.push(<div key={e.id}>{e.name}</div>)
@@ -27,15 +25,28 @@ class Bookmark extends Component {
         return results
     }
 
+    nextPath(path) {
+        this.props.history.push({
+            pathname: path,
+            data: this.props // your data array of objects
+        })
+    }
+
     render(){
         return (
             <div>
-                <Container>
+                <Container id="bookmark">
                     {this.display()}
+                    <Button 
+                        variant="secondary" 
+                        key="bookmark-submit" 
+                        onClick={() => this.nextPath('/select')}>
+                            Submit
+                    </Button>
                 </Container>
             </div>
         );
     }
 }
 
-export default Bookmark;
+export default withRouter(Bookmark);

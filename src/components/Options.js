@@ -11,72 +11,10 @@ import { withRouter } from 'react-router-dom';
 class Options extends Component {
     constructor() {
         super();
-        this.metadata = [
-            {
-                "name": "RP Total Enrolment 2019",
-                "resource_id": "1525c43e-b3b4-4071-a3c2-fb3a298b399b",
-                "total_rows": 3,
-                "measures": [
-                    {
-                        "title": "Academic year",
-                        "name": "academic_year",
-                        "type": "datetime",
-                        "interval": "year",
-                        "coverage": {
-                            "max": "2019",
-                            "min": "2017"
-                        },
-                        "options": [
-                            "2019",
-                            "2018",
-                            "2017"
-                        ]
-                    }
-                ],
-                "values": [
-                    {
-                        "title": "Total enrolment",
-                        "unit": "EA",
-                        "name": "total_enrolment"
-                    }
-                ]
-            },
-            {
-                "name": "Enrolment - MOE Kindergartens",
-                "resource_id": "4ad866a7-c43a-4645-87fd-fc961c9de78a",
-                "total_rows": 7,
-                "measures": [
-                    {
-                        "title": "Year",
-                        "name": "year",
-                        "type": "datetime",
-                        "interval": "year",
-                        "coverage": {
-                            "max": "2020",
-                            "min": "2014"
-                        },
-                        "options": [
-                            "2014",
-                            "2015",
-                            "2016",
-                            "2017",
-                            "2018",
-                            "2019",
-                            "2020"
-                        ]
-                    }
-                ],
-                "values": [
-                    {
-                        "title": "Enrolment",
-                        "unit": "No. of Students",
-                        "name": "enrolment"
-                    }
-                ]
-            }
-        ];
+        this.metadata = [];
         this.options = [];
         this.state = {
+            promiseIsResolved: false,
             options: [],
         };
     };
@@ -109,7 +47,35 @@ class Options extends Component {
         console.log("options", this.options)
     }
 
+    fetchData() {
+        let ids = []
+        console.log("props", this.props.metadata.resourceId);
+        this.props.metadata.resourceId.forEach(item => {
+            ids.push(item.id)
+        })
+        let idString = ids.join()
+        fetch(`http://localhost:7082/api/resource?resource_id=${idString}`, { 
+            method: 'get', 
+            mode: 'cors'
+        }).then(response =>
+            {
+                var data = response.json()
+                console.log('data', data);
+                return data
+            }
+        ).then(result =>
+            {
+                console.log(result);
+                let info = result.info
+                this.metadata = info
+                console.log('metadata',this.metadata);
+                this.setState({promiseIsResolved: true})
+            }
+        )
+    }
+
     reactForm = () => {
+
         let form = []
         var trace = this.options;
 
@@ -169,15 +135,22 @@ class Options extends Component {
         return form
     }
     
+    componentDidMount(){
+        this.fetchData()
+    }
 
     render(){
-        return (
-            <Container>
-            <div>
-                { this.reactForm() }
-            </div>
-            </Container>
-        );
+        if(!this.state.promiseIsResolved){
+            return null;
+        } else {
+            return (
+                <Container>
+                <div>
+                    { this.reactForm() }
+                </div>
+                </Container>
+            );
+        }
     }
 }
 

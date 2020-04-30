@@ -3,6 +3,9 @@ import Bookmark from './Bookmark';
 import FilterForm from './FilterForm';
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import './styles/browser.css';
 
 class Datasets extends Component {
     constructor(props) {
@@ -66,12 +69,20 @@ class Datasets extends Component {
     
     render() {
         return (
-        <div id="browser">
-            <Container>
-                <FilterForm onChange={this.props.onChange}/>
-                {this.display()}
+        <div>
+            <Container id="main">
+                <Row>
+                    <Col md="auto">
+                        <Container id="results">
+                            <FilterForm onChange={this.props.onChange}/>
+                            {this.display()}
+                        </Container>
+                    </Col>
+                    <Col md="auto">
+                        <Bookmark id="bookmark" resourceId={this.state.resourceId} handler={this.handler} />   
+                    </Col>
+                </Row>
             </Container>
-            <Bookmark resourceId={this.state.resourceId} handler={this.handler} />
         </div>
         )
     }

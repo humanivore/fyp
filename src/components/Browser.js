@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import database from '../../server/db.json';
 import Datasets from './Datasets';
-import './styles/browser.css';
 
 class Browser extends Component {
     constructor() {
         super();
-        this.resource = [];
         this.state = {
             datasets: [],
             filtered: [],

@@ -1,8 +1,13 @@
-.browser {
-    display:flex; 
-    flex-direction:row;
+#main.container {
+    width: 1000px;
+    margin: auto;
 }
 
-.button {
-    margin: 10px;
+#bookmark {
+    width: 300px;
+    padding-top: 20px;
+}
+
+button {
+    margin: 10px 0px;
 }

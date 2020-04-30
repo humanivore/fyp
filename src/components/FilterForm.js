@@ -25,6 +25,7 @@ class FilterForm extends Component {
           <FormControl
             aria-label="Default"
             aria-describedby="search"
+            placeholder="Start typing to search for datasets!"
             id="filter"
             value={this.state.filter}
             onChange={this.handleChange}

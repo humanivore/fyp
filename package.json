@@ -1,14 +1,11 @@
 {
-  "name": "flask-react-boilerplate",
+  "name": "sgdata",
   "version": "0.1.0",
-  "author": "Yale DH Lab",
+  "author": "Fiona Leung",
   "license": "MIT",
-  "description": "Minimal boilerplate for a Flask + React application",
+  "description": "Data visualisation webapp for data.gov.sg",
   "main": "server/server.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/duhaime/react-boilerplate.git"
-  },
+  "repository":"github:humanivore/fyp",
   "scripts": {
     "start": "webpack-dev-server --port 7081 --history-api-fallback --mode=development",
     "build": "webpack --config webpack.config.js --mode=production",

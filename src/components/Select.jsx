@@ -3,7 +3,7 @@ import Options from './Options';
 
 const Select = (props) => (
   <div className='select'>
-    <Options />
+    <Options metadata={props.location.data}/>
   </div>
 )
 

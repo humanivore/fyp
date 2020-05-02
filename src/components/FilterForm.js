@@ -31,10 +31,6 @@ class FilterForm extends Component {
             onChange={this.handleChange}
           />
         </InputGroup>
-        {/* <label htmlFor="filter">Search </label>
-        <input type="text" id="filter" 
-          value={this.state.filter} 
-          onChange={this.handleChange}/> */}
       </div>
       )
   }

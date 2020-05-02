@@ -16,12 +16,12 @@ class Data extends Component {
     };
 
     fetchAndDisplay() {
-        if (this.props.data.length > 1) {
+        if (this.props.data.length > 0) {
             let ids = []
             this.props.data.forEach(dataset =>
                 ids.push(dataset["id"]))
             let idString = ids.join()
-            fetch(`http://localhost:7082/api/multidata?resource_id=${idString}`, { 
+            fetch(`http://localhost:7082/api/data?resource_id=${idString}`, { 
                 method: 'post', 
                 mode: 'cors',
                 headers: new Headers({'Content-Type': 'application/json'}),

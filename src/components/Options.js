@@ -15,7 +15,6 @@ class Options extends Component {
         this.options = [];
         this.state = {
             promiseIsResolved: false,
-            options: [],
         };
     };
 
@@ -36,10 +35,11 @@ class Options extends Component {
 
         for(const [k, v] of Object.entries(this.options[index])){
             if(k == measure){
-                if(v.includes(option)){
-                    v = v.filter(e => e !== option)
+                if(v.indexOf(option) > -1){
+                    this.options[index][measure] = v.filter(e => e !== option)
+                    console.log("in here");
                 } else {
-                    v.push(option)
+                    this.options[index][measure].push(option)
                 }
             }
         }
@@ -69,7 +69,7 @@ class Options extends Component {
                 let info = result.info
                 this.metadata = info
                 console.log('metadata',this.metadata);
-                this.setState({promiseIsResolved: true})
+                this.setState({promiseIsResolved: true}) // to tell render() that fetchData is done and form can now be rendered
             }
         )
     }
@@ -110,8 +110,7 @@ class Options extends Component {
                                     var value = index + "||" + measure.name + "||" + option;
                                     options.push(<FormControlLabel
                                         value={value}
-                                        checked // hello pls send help
-                                        control={<Checkbox />}
+                                        control={<Checkbox defaultChecked={true} />}
                                         label={option}
                                         labelPlacement="end"
                                         onChange={this.handleCheck.bind(this)}

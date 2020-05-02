@@ -60,8 +60,8 @@ def resource():
 	return resp
 
 
-@app.route('/api/data', methods=['GET'])
-def data():
+@app.route('/api/old_data', methods=['GET'])
+def old_data():
 	"""
 	API route for retrieving dataset via data.gov.sg API
 	Required parameter: resource_id
@@ -81,8 +81,7 @@ def data():
 	result = jsonify(response.json()['result']['records'])
 
 	headers = {
-		"Content-Type": "application/json",
-		# "X-header": session.get('hi', 'not set')
+		"Content-Type": "application/json"
 	}
 	resp = make_response(result, 200)
 	resp.headers = headers
@@ -90,8 +89,8 @@ def data():
 	return resp
 
 
-@app.route('/api/multidata', methods=['GET', 'POST'])
-def multidata():
+@app.route('/api/data', methods=['GET', 'POST'])
+def data():
 	# should return x-axis (list) and series (dict of lists)
 	resource_id = request.args.get('resource_id')
 	
@@ -137,5 +136,4 @@ def multidata():
 @app.route('/<path:path>')
 def index(path):
 	'''Return index.html for all non-api routes'''
-	# session['hi'] = "hi"
 	return render_template('index.html')

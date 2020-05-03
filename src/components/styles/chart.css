@@ -1,5 +1,5 @@
-.container {
+#chart-container.container {
     margin: auto;
-    width: 600px;
-    padding: 20px 0;
+    width: 1000px;
+    padding: 30px 100px;
 }

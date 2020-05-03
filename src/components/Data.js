@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Chart from "react-apexcharts";
 import Alert from 'react-bootstrap/Alert';
 import Container from 'react-bootstrap/Container';
-import './Styles/options.css';
+import './Styles/chart.css';
 
 
 class Data extends Component {
@@ -132,11 +132,12 @@ class Data extends Component {
         try {
             return (
                 <div className="chart">
-                    <Container>
+                    <Container id="chart-container">
                     <Chart
                   options={this.state.options}
                   series={this.state.series}
-                  width="500"
+                  width="800"
+                  height="400"
                 />
                     </Container>
                 </div>

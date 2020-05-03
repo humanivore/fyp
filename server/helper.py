@@ -1,4 +1,5 @@
 from flask import make_response
+import itertools
 import pandas as pd
 import requests
 import json
@@ -79,85 +80,6 @@ def get_measure_options(resource_id, total_rows, measure_name):
 	return options
 
 
-# def process_fields(fields1, fields2):
-# 	# find column with "year", "half-year", "quarter", "month" in time-based series
-# 	# how to handle same interval - return field_id1, field_id2
-# 	# how to handle both time but diff interval - return field_id1, field_id2
-# 	# how to handle cases with no common columns - return false
-
-# 	field_id1, field1_interval = check_time_interval(fields1)
-# 	field_id2, field2_interval = check_time_interval(fields2)
-
-# 	if field_id1 is None or field_id2 is None:
-# 		return False
-# 	elif field1_interval == field2_interval:
-# 		return [True, field_id1, field_id2]
-# 	else:
-# 		return [False, field_id1, field_id2]
-
-
-# def process_data(data1, data2):
-# 	# try to merge with common column
-# 	# e.g. df1.merge(df2, how='left', left_on='year', right_on='academic_year')
-# 	fields1 = data1['result']['fields']
-# 	fields2 = data2['result']['fields']
-
-# 	records1 = data1['result']['records']
-# 	records2 = data2['result']['records']
-
-# 	processed_fields = process_fields(fields1, fields2)
-
-# 	if processed_fields is False:
-# 		pass
-# 	else:
-# 		df1 = pd.DataFrame(records1)
-# 		df2 = pd.DataFrame(records2)
-
-# 		if processed_fields[0] is True:
-# 			### HERE. assume for now that left join, left range > right 
-# 			df3 = df1.merge(df2, how='left', left_on=processed_fields[1], right_on=processed_fields[2])
-# 			df3 = df3.sort_values(by=processed_fields[1],ascending=True) # sort bc some datasets are reversed
-# 			df3 = df3.where(pd.notnull(df3), None) # replace NaN with None so null in JSON
-# 			year = df3[processed_fields[1]].tolist()
-# 			series1 = {
-# 				"name": 'Enrolment - MOE Kindergartens', 
-# 				"data": df3['enrolment'].tolist()
-# 			}
-# 			series2 = {
-# 				"name": "Republic Polytechnic Total Enrolment 2019",
-# 				"data": df3['total_enrolment'].tolist()
-# 			}
-			
-# 			return year, series1, series2
-
-
-# def check_time_interval(fields):
-# 	field_id = ""
-# 	field_interval = ""
-# 	for item in fields:
-# 		field = item['id']
-# 		if "month" in field:
-# 			field_id = field
-# 			field_interval = 1
-# 			break
-# 		elif "quarter" in field:
-# 			field_id = field
-# 			field_interval = 3 
-# 			break
-# 		elif "half-year" in field:
-# 			field_id = field
-# 			field_interval = 6
-# 			break
-# 		elif "year" in field:
-# 			field_id = field
-# 			field_interval = 12
-# 			break
-# 		else:
-# 			field_id = None
-# 			field_interval = None 
-# 	return field_id, field_interval
-
-
 def new_process_data(options):
 	options = options['data']
 	all_data = {}
@@ -214,26 +136,29 @@ def new_process_data(options):
 								label = dataset['dataset_name'] + " - " + item['title']
 							labelled_sorted_data[label] = v
 		else:
-			for measure in non_datetime_measures:
-				for option in dataset[measure]:
-					new_list = list(filter(lambda x: x[measure] == option, data_required))
-					if 'datetime' in dataset:
-						datetime = dataset['datetime']
-						value = dataset['values']
-						sorted_data[option][datetime] = list(map(lambda x: x[datetime], new_list))
-						sorted_data[option][value] = list(map(lambda x: x[value], new_list))
-						meta = get_info_by_resource_id(id).json()['result']['fields']
-						labelled_sorted_data = {}
-						for sorted_list in sorted_data:
-							for k,v in sorted_list.items():
-								for item in meta:
-									if item['name'] == k:
-										if item['type'] == 'datetime':
-											label = standardised_time_label(item)
-											dataset['interval'] = label
-										else:
-											label = dataset['dataset_name'] + " - " + item['title']
-										labelled_sorted_data[label] = v
+			if 'datetime' in dataset:
+				all_options = []
+				for measure in non_datetime_measures:
+					options_list = dataset[measure]
+					all_options.append(options_list)
+				combinations = list(itertools.product(*all_options))
+				value = dataset['values']
+				dataset_label = dataset['dataset_name'] + ": "
+				for combination in combinations:
+					go_deeper(sorted_data, combination, non_datetime_measures, data_required, value, dataset_label)
+				datetime = dataset['datetime']
+				sorted_data[datetime] = dataset[datetime]
+				meta = get_info_by_resource_id(id).json()['result']['fields']
+				value_title = list(filter(lambda x: x['name'] == value, meta))[0]['title']
+				labelled_sorted_data = {}
+				for k,v in sorted_data.items():
+					if k == datetime:
+						field = list(filter(lambda x: x['name'] == k, meta))[0]
+						label = standardised_time_label(field)
+						dataset['interval'] = label
+					else:
+						label = k + " - " + value_title
+					labelled_sorted_data[label] = v
 		
 		all_data[dataset['dataset_name']] = labelled_sorted_data
 	
@@ -263,13 +188,7 @@ def same_time_interval(data, interval):
 	dfs = []
 	multi = False
 	for dataset in data.values():
-		for items in dataset.values():
-			if isinstance(items, dict):
-				# code for multilayer
-				pass
-			else:
-				break
-		dfs.append(pd.DataFrame.from_dict(dataset))
+		dfs.append(pd.DataFrame({k: pd.Series(v) for k, v in dataset.items()}))
 	time = []
 	if not multi:
 		for dataset in data.values():
@@ -306,3 +225,14 @@ def standardised_time_label(field):
 		return "Month"
 	else:
 		raise ValueError("Not datetime")
+
+
+def go_deeper(dict, tuple, measures, data, value, label):
+	data = list(filter(lambda x: x[measures[0]] == tuple[0], data))
+	if tuple[0] == tuple[-1]: # if last element
+		value_data = list(map(lambda x: x[value], data))
+		label += tuple[0]
+		dict[label] = value_data
+	else:
+		label += (tuple[0] + ', ')
+		return go_deeper(dict, tuple[1:], measures[1:], data, value, label)

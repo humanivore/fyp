@@ -179,6 +179,8 @@ def new_process_data(options):
 
 	if is_same_interval:
 		chart_data = same_time_interval(all_data, interval)
+	elif is_datetime:
+		chart_data = diff_time_interval(all_data, options)
 
 	resp = make_response({"data": chart_data}, 200)
 	return resp
@@ -186,32 +188,86 @@ def new_process_data(options):
 
 def same_time_interval(data, interval):
 	dfs = []
-	multi = False
 	for dataset in data.values():
 		dfs.append(pd.DataFrame({k: pd.Series(v) for k, v in dataset.items()}))
 	time = []
-	if not multi:
-		for dataset in data.values():
-			time.append(dataset[interval])
-		time_set = []
-		for item in time:
-			time_set = time_set + item
-		time_set = {interval: list(sorted(set(time_set)))}
-		control_df = pd.DataFrame.from_dict(time_set)
+	for dataset in data.values():
+		time.append(dataset[interval])
+	time_set = []
+	for item in time:
+		time_set = time_set + item
+	time_set = {interval: list(sorted(set(time_set)))}
+	control_df = pd.DataFrame.from_dict(time_set)
 		
-		merged_df = control_df
-		for df in dfs:
-			merged_df = merged_df.merge(df, how='left', left_on=interval, right_on=interval)
-		merged_df = merged_df.where(pd.notnull(merged_df), None) # replace NaN with None so null in JSON
+	merged_df = control_df
+	for df in dfs:
+		merged_df = merged_df.merge(df, how='left', left_on=interval, right_on=interval)
+	merged_df = merged_df.where(pd.notnull(merged_df), None) # replace NaN with None so null in JSON
 
-		chart_data = {
-			"datetime": interval,
-			interval: merged_df[interval].tolist()
-		}
-		for column in merged_df:
-			chart_data[column] = merged_df[column].tolist()
+	chart_data = {
+		"datetime": interval,
+		interval: merged_df[interval].tolist()
+	}
+	for column in merged_df:
+		chart_data[column] = merged_df[column].tolist()
 			
-		return chart_data
+	return chart_data
+
+
+def diff_time_interval(data, options):
+	dfs = []
+
+	interval_types = ['Month', 'Quarter', 'Half Year', 'Year']
+	shortest_interval = ''
+
+	for dataset in options:
+		interval = dataset['interval']
+		if shortest_interval == '':
+			shortest_interval = interval
+		else:
+			index = interval_types.index(interval)
+			if index < interval_types.index(shortest_interval):
+				shortest_interval = interval
+
+	for key,dataset in data.items():
+		if shortest_interval not in dataset:
+			this_interval = ''
+			for sets in options:
+				if sets['dataset_name'] == key:
+					this_interval = sets['interval']
+			dataset[shortest_interval] = change_interval(dataset.pop(this_interval), this_interval, shortest_interval)
+		data[key] = dataset
+
+	for dataset in data.values():
+		dfs.append(pd.DataFrame({k: pd.Series(v) for k, v in dataset.items()}))
+
+	time = []
+	for dataset in data.values():
+		time.append(dataset[shortest_interval])
+	time_set = []
+	for item in time:
+		time_set = time_set + item
+	time_set = set(sorted(set(time_set)))
+	time_set = {shortest_interval: list(fill_missing_values(time_set, shortest_interval))}
+	control_df = pd.DataFrame.from_dict(time_set)
+		
+	merged_df = control_df
+	for df in dfs:
+		merged_df = merged_df.merge(df, how='left', left_on=shortest_interval, right_on=shortest_interval)
+	
+	merged_df = merged_df.apply(pd.to_numeric, errors='ignore')
+	merged_df = merged_df.interpolate()
+	merged_df = merged_df.round(1)
+	merged_df = merged_df.where(pd.notnull(merged_df), None) # replace NaN with None so null in JSON
+
+	chart_data = {
+		"datetime": shortest_interval,
+		shortest_interval: merged_df[shortest_interval].tolist()
+	}
+	for column in merged_df:
+		chart_data[column] = merged_df[column].tolist()
+			
+	return chart_data
 
 
 def standardised_time_label(field):
@@ -236,3 +292,40 @@ def go_deeper(dict, tuple, measures, data, value, label):
 	else:
 		label += (tuple[0] + ', ')
 		return go_deeper(dict, tuple[1:], measures[1:], data, value, label)
+
+
+def fill_missing_values(time_set, interval):
+	filled_time = set(time_set)
+	for entry in time_set:
+		year = entry[:4]
+		if interval == "Half Year":
+			all_possible = {f'{year}-H1', f'{year}-H2'}
+		elif interval == "Quarter":
+			all_possible = {f'{year}-Q1', f'{year}-Q2', f'{year}-Q3', f'{year}-Q4'}
+		elif interval == "Month":
+			all_possible = {f'{year}-01', f'{year}-02', f'{year}-03', f'{year}-04', f'{year}-05', f'{year}-06', f'{year}-07', f'{year}-08', f'{year}-09', f'{year}-10', f'{year}-11', f'{year}-12'}
+		filled_time.update(all_possible)
+
+	return list(sorted(list(time_set)))
+
+
+def change_interval(time_series, original_interval, target_interval):
+	if target_interval == "Half Year":
+		if original_interval == "Year":
+			new_time = list(map(lambda x: x + "-H1", time_series))
+	
+	if target_interval == "Quarter":
+		if original_interval == "Year":
+			new_time = list(map(lambda x: x + "-Q1", time_series))
+		elif original_interval == "Half Year":
+			new_time = list(map(lambda x: (x[:4] + "-Q1") if "H1" in x else (x[:4] + "-Q3"), time_series))
+	
+	if target_interval == "Month":
+		if original_interval == "Year":
+			new_time = list(map(lambda x: x + "-01", time_series))
+		elif original_interval == "Half Year":
+			new_time = list(map(lambda x: (x[:4] + "-01") if "H1" in x else (x[:4] + "-07"), time_series))
+		elif original_interval == "Quarter":
+			new_time = list(map(lambda x: (x[:4] + "-01") if "Q1" in x else ((x[:4] + "-04") if "Q2" in x else ((x[:4] + "-07") if "Q3" in x else (x[:4] + "-10"))), time_series))
+
+	return new_time

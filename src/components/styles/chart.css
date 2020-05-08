@@ -1,5 +1,10 @@
 #chart-container.container {
     margin: auto;
-    width: 1000px;
-    padding: 30px 100px;
+    width: 800px;
+    padding: 30px 50px;
+}
+
+.chart-type {
+    display: 'flex'; 
+    flex-direction: 'row';
 }

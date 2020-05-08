@@ -1,7 +1,9 @@
 import json
 import requests
+import time
 
 if __name__ == "__main__":
+    print(f"Start: {time.asctime()}")
     datasets = {
         "data": []
     }
@@ -24,9 +26,8 @@ if __name__ == "__main__":
                     "description": resp.json()['result']['description']
                 }
                 datasets['data'].append(item)
-                print("appended")
     except:
-        with open('db.json', 'w', encoding='utf-8') as f:
-            json.dump(datasets, f, ensure_ascii=False, indent=4)
+        quit()
     with open('db.json', 'w', encoding='utf-8') as f:
             json.dump(datasets, f, ensure_ascii=False, indent=4)
+    print(f"End: {time.asctime()}")

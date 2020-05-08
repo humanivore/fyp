@@ -49,8 +49,8 @@ class Options extends Component {
 
     fetchData() {
         let ids = []
-        console.log("props", this.props.metadata.resourceId);
-        this.props.metadata.resourceId.forEach(item => {
+        console.log("props", this.props.metadata.resource);
+        this.props.metadata.resource.forEach(item => {
             ids.push(item.id)
         })
         let idString = ids.join()

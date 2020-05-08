@@ -1,18 +1,28 @@
 import React, { Component } from 'react';
 import Chart from "react-apexcharts";
-import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup'
+import Switch from '@material-ui/core/Switch';
+import Apex from './Apex';
 import './Styles/chart.css';
 
 
 class Data extends Component {
     constructor() {
         super();
+        this.handleChartType = this.handleChartType.bind(this);
+        this.handleDisplayToggle = this.handleDisplayToggle.bind(this);
+        this.handleRender = this.handleRender.bind(this);
         this.state = {
-            data: [],
+            loaded: false,
             options: {},
             series: [],
         };
+        this.config = []
     };
 
     fetchAndDisplay() {
@@ -47,14 +57,12 @@ class Data extends Component {
                             } else {
                                 seriesData.push({
                                     name: k,
+                                    type: "line",
                                     data: v
                                 })
                             }
                         }
                         let options = {
-                            chart: {
-                                type: "line"
-                            },
                             xaxis: {
                                 categories: x
                             }
@@ -63,53 +71,15 @@ class Data extends Component {
                         console.log("series", seriesData);
                         this.setState({options: options})
                         this.setState({series: seriesData})
-                    }
-                }
-            )
-        } else {
-            fetch(`http://localhost:7082/api/data?resource_id=${this.props.resource}`, { method: 'get', mode: 'cors' })
-            .then(results =>
-                {
-                    var ans = results.json()
-                    console.log(ans)
-                    return ans
-                }
-            )
-            .then(data1 => {
-                console.log("data2", data1);
-                this.setState({data: data1})
-                console.log("state", this.state.data);
-                var seriesData = []
-                this.state.data.forEach(element => {
-                    var item = {}
-                    item['x'] = this.findKey(element, 'year');
-                    item['y'] = this.findKey(element, 'enrolment');
-                    seriesData.push(item);
-                })
-                var series = [{
-                    name: "Enrolment - MOE Kindergartens",
-                    data: data1,
-                }]
-                this.setState({series: series})
-                console.log("series", this.state.series.data);
-                var options = {                
-                    chart: {
-                        id: "basic-bar"
-                    },
-                    xaxis: {
-                        type: 'numeric'
-                    }
-                }
-                this.setState({options: options})
-            });
-        }
-    }
 
-    findKey(element, keyword) {
-        for(var key in element) {
-            if(key.toLowerCase().indexOf(keyword.toLowerCase()) > -1) {
-                return element[key];
-            }
+                        seriesData.forEach(series => {
+                            series['display'] = true
+                            this.config.push(series)
+                        })
+                        this.setState({loaded: true})
+                    }
+                }
+            )
         }
     }
 
@@ -120,6 +90,41 @@ class Data extends Component {
     //     }
     // }
 
+    handleDisplayToggle(e) {
+        console.log("e", e.target.value);
+        this.config.forEach(series => {
+            if(series.name == e.target.value){
+                if(series.display){
+                    series.display = false
+                } else {
+                    series.display = true
+                }
+            }
+        })
+    }
+
+    handleChartType(e) {
+        console.log("target", e.target);
+        this.config.forEach(series => {
+            if(series.name == e.target.name){
+                series.type = e.target.value
+            }
+        })
+        console.log("config", this.config);
+    }
+
+    handleRender() {
+        console.log("I'm here");
+        let configToPass = []
+        this.config.forEach(e => {
+            if(e.display){
+                configToPass.push(e)
+            }
+        })
+        this.setState({series: configToPass})
+        console.log("series", this.state.series)
+    }
+
     componentDidMount() {
         try {
             this.fetchAndDisplay();
@@ -127,26 +132,48 @@ class Data extends Component {
 
         }
     }
+
+    showConfig = () => {
+        let form = []
+        this.config.forEach(data => {
+            let config = []
+            config.push(<h5>{data.name}</h5>)
+            config.push(<Form.Label><h6>Display</h6></Form.Label>)
+            config.push(<span>Off </span>)
+            config.push(<Switch defaultChecked value={data.name} onChange={this.handleDisplayToggle} />)
+            config.push(<span> On</span>)
+            config.push(<Form.Label><h6>Chart Type</h6></Form.Label>)
+            config.push(<RadioGroup class="chart-type" name={data.name} defaultValue="line" onChange={this.handleChartType}>
+            <FormControlLabel value="line" control={<Radio />} label="Line" />
+            <FormControlLabel value="column" control={<Radio />} label="Column" />
+            <FormControlLabel value="area" control={<Radio />} label="Area" />
+            </RadioGroup>)
+            form.push(<Form.Group>{config}</Form.Group>)
+        })
+        form.push(<Button variant="outline-secondary" onClick={this.handleRender}>Render</Button>)
+
+        return form
+    }
     
     render() {
-        try {
+        if(!this.state.loaded){
+            return null;
+        } else {
             return (
-                <div className="chart">
+                <div className="data">
                     <Container id="chart-container">
                     <Chart
                   options={this.state.options}
                   series={this.state.series}
-                  width="800"
-                  height="400"
+                  width="100%"
                 />
+                    </Container>
+                    <Container id="chart-options">
+                        {this.showConfig()}
                     </Container>
                 </div>
             )
-        } catch(err) {
-            <Alert variant='primary'>
-                Please click on the submit button again!
-            </Alert>
-        } 
+        }
     }
 }
 

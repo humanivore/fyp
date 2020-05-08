@@ -13,7 +13,7 @@ class Datasets extends Component {
         this.changeState = this.changeState.bind(this);
         this.handler = this.handler.bind(this)
         this.state = {
-            resourceId: []
+            resource: []
         }
     }
 
@@ -41,25 +41,26 @@ class Datasets extends Component {
         }
         console.log(item)
         let newArray = []
-        console.log(this.state.resourceId);
-        if(this.state.resourceId.indexOf(item) > -1){
-            newArray = this.state.resourceId.filter(e => e !== item)
+        console.log(this.state.resource);
+        if(this.state.resource.indexOf(item) > -1){
+            newArray = this.state.resource.filter(e => e !== item)
         } else {
-            newArray = [...this.state.resourceId, item];
+            newArray = [...this.state.resource, item];
         }
-        this.setState({resourceId: newArray})
-        console.log(this.state.resourceId);
+        this.setState({resource: newArray})
+        console.log("resource", this.state.resource);
     }
 
     handler(e) {
         let id = e.target.id
         let newArray = []
-        this.state.resourceId.forEach(item => {
+        this.state.resource.forEach(item => {
             for (let [key, value] of Object.entries(item)) {
                 if(key == "id"){
                     if(value == id){
-                        newArray = this.state.resourceId.filter(e => e !== item)
-                        this.setState({resourceId: newArray})
+                        newArray = this.state.resource.filter(e => e !== item)
+                        this.setState({resource: newArray})
+                        console.log("resource", this.state.resource);
                     }
                 }
             }
@@ -79,7 +80,7 @@ class Datasets extends Component {
                         </Container>
                     </Col>
                     <Col md="auto">
-                        <Bookmark id="bookmark" resourceId={this.state.resourceId} handler={this.handler} />   
+                        <Bookmark id="bookmark" resource={this.state.resource} handler={this.handler} />   
                     </Col>
                 </Row>
             </Container>

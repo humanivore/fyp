@@ -11,7 +11,7 @@ class Bookmark extends Component {
     display() {
         let results = []
         results.push(<h4 id="title-bookmark">Bookmarked</h4>)
-        this.props.resourceId.forEach(e => {
+        this.props.resource.forEach(e => {
             let item = []
             item.push(<div key={e.id}>{e.name}</div>)
             item.push(<Button 
@@ -28,7 +28,7 @@ class Bookmark extends Component {
     nextPath(path) {
         this.props.history.push({
             pathname: path,
-            data: this.props // your data array of objects
+            data: this.props // the data array of objects
         })
     }
 

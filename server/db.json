@@ -1805,6 +1805,31 @@
         "description": "Number of green vehicles (registered)"
     },
     {
+        "name": "CMP applicants by accommodation type from 2011 to 2019",
+        "id": "826682ed-7e58-431c-b9fd-05270884d209",
+        "description": "CMP applicants by accommodation type from 2011 to 2019"
+    },
+    {
+        "name": "CMP applicants by age group from 2011 to 2019",
+        "id": "dde1980a-373a-4394-b86b-e1cd90f25edc",
+        "description": "CMP applicants by age group from 2011 to 2019"
+    },
+    {
+        "name": "CMP applicants by gender from 2011 to 2019",
+        "id": "38a4d2de-98e2-43cf-9ce1-e9ba886bfc02",
+        "description": "CMP applicants by gender from 2011 to 2019"
+    },
+    {
+        "name": "CMP applicants by living arrangement from 2011 to 2019",
+        "id": "acfe30c4-831c-42d3-8a85-2a3bf64737bd",
+        "description": "CMP applicants by living arrangement from 2011 to 2019"
+    },
+    {
+        "name": "CMP applicants by marital status from 2011 to 2019",
+        "id": "120fccf1-f494-44e7-8d6c-4cc016d18773",
+        "description": "CMP applicants by marital status from 2011 to 2019"
+    },
+    {
         "name": "COE Results",
         "id": "f7bbdc43-c568-4e60-9afa-b77ba5a14aa0",
         "description": "There are 2 COE Open Bidding exercises in a month. The bidding exercises usually start on the first Monday and third Monday of the month at 12pm and lasts for 3 working days. The exercises will usually end on the Wednesday in the same week at 4pm."
@@ -4325,8 +4350,18 @@
         "description": "Listing of Healthier Caterers"
     },
     {
+        "name": "Healthier Caterers (GEOJSON)",
+        "id": "aba4eedb-5ecd-464b-9993-15b1a6cee197",
+        "description": "Listing of Healthier Caterers"
+    },
+    {
         "name": "Healthier Eateries (KML)",
         "id": "cf48cea3-dcc7-45e3-821e-b576c31ac69d",
+        "description": "List of Healthier Dining partners"
+    },
+    {
+        "name": "Healthier Eateries (GEOJSON)",
+        "id": "48f960b9-bb2e-4545-a5bc-ecbdd1c5ed4e",
         "description": "List of Healthier Dining partners"
     },
     {
@@ -8493,6 +8528,11 @@
         "name": "Number of Aquarium Fish Farms for Breeding/Export, Annual",
         "id": "7bb317bf-f03b-4b12-9846-697ba6ed104d",
         "description": "The table shows the number of farms for the category. "
+    },
+    {
+        "name": "Number of cases from 2011 to 2019",
+        "id": "74a898a5-dd3a-436c-89ed-6b719736da00",
+        "description": "Number of cases registered at the Commissioner's Office for the Maintenance of Parents from 2011 to 2019"
     },
     {
         "name": " Number of children at 2 years of age immunised by sector and vaccine type",
@@ -15263,6 +15303,26 @@
         "name": "Tree Conservation Area (KML)",
         "id": "8614b795-500e-45e7-a8c2-7eb3f885f896",
         "description": "On 2 August 1991, in an effort to control indiscriminate felling of mature trees, two areas in the South Central and Eastern parts of Singapore were gazetted as Tree Conservation Areas [under the Parks and Trees (Preservation of Trees) Order 1991]. The two Tree Conservation Areas (TCAs) were selected based on the extent of greenery and the number of mature trees within the areas that are worth conserving. These mature trees provide the lush verdant and wooded ambience to enhance the beauty of the environment. Some of these trees have taken as long as 50 to 100 years to reach their present size.\n\nThe gazette requires written permission for proposals to fell any mature tree to be obtained from the Commissioner of Parks & Recreation. Mature trees are defined as trees with girth more than one metre measured half a metre from the ground. This applies to developers as well as owners of private properties and even if no development works are being undertaken.\n\nThis dataset presents the indicative extent of the two TCAs."
+    },
+    {
+        "name": "Tribunal for Maintenance of Parents Outcomes of Applications 2019",
+        "id": "c7980f10-8606-45b3-8c3a-a16a8b290acc",
+        "description": "Tribunal for Maintenance of Parents Outcomes of Applications 2019\r\nTribunal for Maintenance of Parents Applicants by Living Arrangements 2019\r\nTribunal for Maintenance of Parents Applicants by Age and Gender 2019\r\nTribunal for Maintenance of Parents No of Cases from 2010 to 2019\r\n"
+    },
+    {
+        "name": "Tribunal for Maintenance of Parents Applicants by Age and Gender 2019",
+        "id": "09cb83ac-6ebf-4b62-86f8-678f07425858",
+        "description": "Tribunal for Maintenance of Parents Outcomes of Applications 2019\r\nTribunal for Maintenance of Parents Applicants by Living Arrangements 2019\r\nTribunal for Maintenance of Parents Applicants by Age and Gender 2019\r\nTribunal for Maintenance of Parents No of Cases from 2010 to 2019\r\n"
+    },
+    {
+        "name": "Tribunal for Maintenance of Parents Applicants by Living Arrangements 2019",
+        "id": "d66fd9a2-656d-4e76-af0d-979d5e2ca3f8",
+        "description": "Tribunal for Maintenance of Parents Outcomes of Applications 2019\r\nTribunal for Maintenance of Parents Applicants by Living Arrangements 2019\r\nTribunal for Maintenance of Parents Applicants by Age and Gender 2019\r\nTribunal for Maintenance of Parents No of Cases from 2010 to 2019\r\n"
+    },
+    {
+        "name": "Tribunal for Maintenance of Parents No of Cases from 2010 to 2019",
+        "id": "7a31cdb0-df53-415d-a57b-d68626e46d11",
+        "description": "Tribunal for Maintenance of Parents Outcomes of Applications 2019\r\nTribunal for Maintenance of Parents Applicants by Living Arrangements 2019\r\nTribunal for Maintenance of Parents Applicants by Age and Gender 2019\r\nTribunal for Maintenance of Parents No of Cases from 2010 to 2019\r\n"
     },
     {
         "name": "Type of Family Nucleus by Ethnic Group",

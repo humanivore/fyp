@@ -5,18 +5,12 @@
   "license": "MIT",
   "description": "Data visualisation webapp for data.gov.sg",
   "main": "server/server.js",
-  "repository":"github:humanivore/fyp",
   "scripts": {
     "start": "webpack-dev-server --port 7081 --history-api-fallback --mode=development",
     "build": "webpack --config webpack.config.js --mode=production",
     "compress": "webpack --config webpack.config.js --mode=production",
     "production": "npm run build && npm run serve",
-    "serve": "set FLASK_APP=server/app.py&& flask run --port=7082",
-    "lint-js": "eslint -c './src/config/.eslintrc.js' src/",
-    "lint-py": "pylint server/app.py",
-    "lint": "npm run lint-js && npm run lint-py",
-    "jest": "jest",
-    "test": "npm run build && npm run lint && npm run jest && pytest"
+    "serve": "set FLASK_APP=server/app.py&& flask run --port=7082"
   },
   "dependencies": {
     "@babel/core": "^7.5.5",

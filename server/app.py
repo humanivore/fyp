@@ -1,14 +1,12 @@
 '''server/app.py - main api app declaration'''
-from flask import Flask, session, request, jsonify, send_from_directory, render_template, make_response
+from flask import Flask, session, request, jsonify, render_template, make_response
 from flask_cors import CORS, cross_origin
-# from flask_session import Session
 import requests
 import helper
 
 '''Main wrapper for app creation'''
 app = Flask(__name__, static_folder='../build')
 CORS(app)
-# Session(app)
 
 ##
 # API routes
@@ -57,35 +55,6 @@ def resource():
 	
 	resp = make_response(info_object, 200)
 
-	return resp
-
-
-@app.route('/api/old_data', methods=['GET'])
-def old_data():
-	"""
-	API route for retrieving dataset via data.gov.sg API
-	Required parameter: resource_id
-	"""
-	resource_id = request.args.get('resource_id')
-
-	if resource_id is None or resource_id == '':
-		resp = make_response("No resource ID specified", 400)
-		return resp
-		
-	response = helper.get_data_by_id(resource_id)
-
-	if response.status_code == 404:
-		resp = make_response("Requested resource does not exist", 404)
-		return resp
-
-	result = jsonify(response.json()['result']['records'])
-
-	headers = {
-		"Content-Type": "application/json"
-	}
-	resp = make_response(result, 200)
-	resp.headers = headers
-	
 	return resp
 
 
